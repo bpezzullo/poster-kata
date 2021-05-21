@@ -23,5 +23,52 @@
                 </tr>
             {% endfor %}
         </table>
+        <h1> Snapshot of all possible Starships </h1>
+        <table border = 1>
+            <tr>
+                <th>Starship id</th>
+                <th>name</th>
+                <th>URL</th>
+                <th>Created</th>
+
+            </tr>
+            {% for row in stars %}
+                <tr>
+                    <td>{{ row.id }}</td>
+                    <td>{{ row.name}} </td>
+                    <td>{{ row.url}} </td>
+                    <td>{{ row.created}} </td>
+
+                </tr>
+            {% endfor %}
+        </table>        
+        
+        <h1> Snapshot Films that the Starships are in </h1>
+        <table border = 1>
+            <tr>
+                <th>Film id</th>
+                <th>Film Link</th>
+            </tr>
+            {% for row in films %}
+                <tr>
+                    <td>{{ row.id }}</td>
+                    <td>{{ row.name }} </td>
+                </tr>
+            {% endfor %}
+        </table>        
+        
+        <h1> Snapshot of Association from Starship to Film </h1>
+        <table border = 1>
+            <tr>
+                <th>Starship id</th>
+                <th>Film id</th>
+            </tr>
+            {% for row in assoc %}
+                <tr>
+                    <td>{{ row.starship_id }}</td>
+                    <td>{{ row.film_id }} </td>
+                </tr>
+            {% endfor %}
+        </table>
     </body>
 </html>

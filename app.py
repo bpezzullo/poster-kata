@@ -24,10 +24,6 @@ engine = create_engine(f"sqlite:///{database_path}")
 
 base = declarative_base()
 
-# Use this to clear out the db
-# ----------------------------------
-#base.metadata.drop_all(engine) 
-
 class Salesdb(base):
     __tablename__ = "salesdb"
     poster_content = Column(String(255),primary_key=True)
@@ -41,14 +37,19 @@ class Salesdb(base):
 # variable for ETL
 database_path='dw'
 engine2 = create_engine(f"sqlite:///{database_path}")
-# conn = engine.connect()
+
 base2 = declarative_base()
 
 
-starships_films = Table('starship_films', base2.metadata,
-    Column('film_id', Integer, ForeignKey('films.id')),
-    Column('starship_id', Integer, ForeignKey('starship.id'))
-    )
+# starships_films = Table('starship_films', base2.metadata,
+#     Column('film_id', Integer, ForeignKey('films.id')),
+#     Column('starship_id', Integer, ForeignKey('starship.id'))
+#     )
+class Starship_films(base2):
+    __tablename__ = "starship_films"
+    id = Column(Integer,primary_key=True)
+    film_id = Column(Integer, ForeignKey('films.id'))
+    starship_id = Column(Integer, ForeignKey('starship.id'))
 
 
 class Sales(base2):
@@ -185,6 +186,7 @@ def getDetails(url):
     cond = True
     count = 0
     filmCnt = 0
+    filmAssocCnt = 0
     while cond:
         for entry in results:
 
@@ -194,22 +196,26 @@ def getDetails(url):
 
             try:
                 for film in entry['films']:
+                    
+                    filmAssocCnt += 1
 
                     results = session2.query(Films.id).filter(Films.name == film).first()
 
                     if results:
                         # print('match film found',int(results))
-                        filmID = results
-                        # new_assoc = insert(starship_films).values(film_id = filmID,
-                        #                            starship_id = count) 
+                        for filmID in results:
+                            new_assoc = Starship_films(id= filmAssocCnt,film_id = filmID,
+                                                   starship_id = count) 
+
                     else:
                         filmCnt += 1
                         new_rec = Films(id=filmCnt,
                                         name = film)
                         session2.add(new_rec)
-                        # new_assoc = insert(starship_films).values(film_id = filmCnt, 
-                                                #   starship_id = count )
-                    # session2.execute(new_assoc)
+                        new_assoc = Starship_films(id= filmAssocCnt,film_id = filmCnt, 
+                                                starship_id = count )
+                        
+                    session2.add(new_assoc)
                     session2.commit()
             except ValueError as ex:
                 print("something went wrong with the film", ex)
@@ -291,10 +297,13 @@ def run_ETL():
                 break
 
     results = session2.query(Sales).all()
+    stars = session2.query(Starship).all()
+    film = session2.query(Films).all()
+    assoc = session2.query(Starship_films).all()
 
     session2.close()
     session.close()
-    return render_template('sale.html',results = results)
+    return render_template('sale.html',results = results, stars = stars, film = film, assoc = assoc)
     # return  'ETL table created'
 
 if __name__ == '__main__':
