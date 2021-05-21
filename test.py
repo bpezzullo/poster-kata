@@ -59,7 +59,7 @@ def getDetails(url):
                         #new_rec = starship_films(film_id = )
                         session2.commit()
             except:
-                print("something wen wrong")
+                print("something went wrong")
                 break
             try:
                 new_rec = Starship(id = count,
@@ -73,6 +73,7 @@ def getDetails(url):
                 # Use this to clear out the db
                 # ----------------------------------
                 base2.metadata.drop_all(engine2)
+                print('could not write Starship')
                 break
 
         if response['next'] == None: break
@@ -98,7 +99,7 @@ base = declarative_base()
 
 # Use this to clear out the db
 # ----------------------------------
-base.metadata.drop_all(engine)
+# base.metadata.drop_all(engine)
 print('dropped')
 
 class Salesdb(base):
@@ -116,63 +117,65 @@ class Salesdb(base):
 # ----------------------------------
 base.metadata.create_all(engine)
 
-
-# get the list of starships
-swURL = base_url + 'starships/'
-# print(swURL)
-
-getList(swURL)
-
-# get the list of planets
-swURL = base_url + 'planets/'
-# print(swURL)
-
-getList(swURL)
-
-# where does the character names start
-startName = len(namesChar)
-
-# get the list of characters
-swURL = base_url + 'people/'
-
-getList(swURL)
-
-# get the length of the array
-maxData = len(namesChar)
-
-# define the table and insert fake data
-
+# check whether there is a salesdb table
 session = Session(bind=engine)
+results = session.query(Salesdb).first()
+if not results:
 
-seed(1)
-email = 'test@gmail.com'
-sales_rep = ''
-for i in range(10):
-    count = randint(1,10)
-    price = round(random() * 10,3)
-    # ran = len(namesChar)/10
-    name = namesChar[randint(0,maxData)]
-    sales = namesChar[randint(0,maxData-startName) + startName]
-    sales_split = sales.rsplit(' ')
-    sales_rep=sales_split[0] + '@swmail.com'
-    print(name,count,price,sales_rep)
-    promoCode = ' '
-    if randint(0,10) == 1: promoCode = 'mobile'
-    try:
-        new_rec = Salesdb(poster_content=name,quantity=count,price=price,email=email, sales_rep=sales_rep,promo_code=promoCode)
-        session.add(new_rec)
-        session.commit()
-    except:
-        # Use this to clear out the db
-        # ----------------------------------
-        base.metadata.drop_all(engine)
-        break
+    # get the list of starships
+    swURL = base_url + 'starships/'
+    # print(swURL)
+
+    getList(swURL)
+
+    # get the list of planets
+    swURL = base_url + 'planets/'
+    # print(swURL)
+
+    getList(swURL)
+
+    # where does the character names start
+    startName = len(namesChar)
+
+    # get the list of characters
+    swURL = base_url + 'people/'
+
+    getList(swURL)
+
+    # get the length of the array
+    maxData = len(namesChar)
+
+
+
+    seed(1)
+    email = 'test@gmail.com'
+    sales_rep = ''
+    for i in range(10):
+        count = randint(1,10)
+        price = round(random() * 10,3)
+        # ran = len(namesChar)/10
+        name = namesChar[randint(0,maxData)]
+        sales = namesChar[randint(0,maxData-startName) + startName]
+        sales_split = sales.rsplit(' ')
+        sales_rep=sales_split[0] + '@swmail.com'
+        print(name,count,price,sales_rep)
+        promoCode = ' '
+        if randint(0,10) == 1: promoCode = 'mobile'
+        try:
+            new_rec = Salesdb(poster_content=name,quantity=count,price=price,email=email, sales_rep=sales_rep,promo_code=promoCode)
+            session.add(new_rec)
+            session.commit()
+        except:
+            # Use this to clear out the db
+            # ----------------------------------
+            base.metadata.drop_all(engine)
+            break
 
 
 for instance in session.query(Salesdb).all():  
-	print("Poster: ", instance.poster_content)
-	print("count: ", instance.quantity)
-	print("---------")
+    print("Poster: ", instance.poster_content)
+    print("count: ", instance.quantity)
+    print("---------")
 
 
 
@@ -186,7 +189,7 @@ base2 = declarative_base()
 
 # Use this to clear out the db
 # ----------------------------------
-base2.metadata.drop_all(engine2)
+#base2.metadata.drop_all(engine2)
 
 starships_films_association = Table('starship_films', base2.metadata,
     Column('film_id', Integer, ForeignKey('films.id')),
@@ -221,6 +224,15 @@ base2.metadata.create_all(engine2)
 
 session2 = Session(bind=engine2)
 
+results = session2.query(Starship).first()
+print(results)
+if results:
+    for instance in session2.query(Starship).all():  
+        print("Poster: ", instance.id)
+        print("count: ", instance.name)
+        print("Total: ",instance.created)
+        print("---------")
+    
 # clear out list
 starshipAr = {}
 
