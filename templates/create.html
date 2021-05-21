@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+    <body>
+        <h1> Sales DB table created with seed number {{seed}}</h1>
+        <table border = 1>
+            <tr>
+                <th>Name</th>
+                <th>Count</th>
+                <th>Price</th>
+                <th>Sales person</th>
+                <th>Promo</th>
+
+            </tr>
+            {% for row in results %}
+                <tr>
+                    <td>{{ row.poster_content }}</td>
+                    <td>{{ row.quantity}} </td>
+                    <td>{{ row.price}} </td>
+                    <td>{{ row.sales_rep}} </td>
+                    <td>{{ row.promo_code}} </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </body>
+</html>
